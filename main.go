@@ -9,8 +9,8 @@ import (
 	"github.com/caasmo/restinpieces"
 	"github.com/caasmo/restinpieces/core"
 	"github.com/caasmo/restinpieces-sqlite-crawshaw"
-	r "github.com/caasmo/restinpieces/router"
 	"github.com/caasmo/restinpieces-httprouter"
+	phuslog "github.com/phuslu/log"
 )
 
 // DefaultLoggerOptions provides default settings for slog handlers.
@@ -59,7 +59,7 @@ func main() {
 	}
 
 	// --- Create the Database Pool ---
-	dbPool, err := sqlitecrawshaw.NewCrawshawPool(*dbfile)
+	dbPool, err := sqlitecrawshaw.NewCrawshawPool(*dbPath)
 	if err != nil {
 		slog.Error("failed to create database pool", "error", err)
 		os.Exit(1) // Exit if pool creation fails
@@ -77,10 +77,9 @@ func main() {
 	// --- Initialize the Application ---
 	_, srv, err := restinpieces.New(
 		core.WithAgeKeyPath(*ageKeyPath),
-		httprouter.WithRouterHttprouter(),
 		sqlitecrawshaw.WithDbCrawshaw(dbPool),
-		restinpieces.WithRouterServeMux(),
-		restinpieces.WithTextLogger(nil),
+		httprouter.WithRouterHttprouter(),
+		WithPhusLogger(nil),
 	)
 
 	if err != nil {
